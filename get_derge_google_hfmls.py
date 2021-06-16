@@ -12,12 +12,15 @@ root_logger.addHandler(handler)
 
 def match_derge_vol(pedurma_vol, derge_vol_mapping):
     derge_vols = []
+    file_name = ''
     for pedurma_sub_vol in pedurma_vol:
         derge_vol_info = derge_vol_mapping.get(pedurma_sub_vol, {})
         if derge_vol_info:
             file_name = derge_vol_info['file_name']
         if file_name:
             derge_vols.append(file_name)
+        else:
+            print(f'match not found..{pedurma_sub_vol}')
     return derge_vols
 
 def get_pages(vol_text):
@@ -73,7 +76,7 @@ def get_derge_google_vol(pedurma_vol, derge_vol_mapping, pedurma_vol_num):
     derge_hfmls = ""
     derge_vols = match_derge_vol(pedurma_vol, derge_vol_mapping)
     for derge_vol in derge_vols:
-        derge_hfmls += f"{Path(f'./derge_hfmls/{derge_vol}.txt').read_text(encoding='utf-8')}\n"
+        derge_hfmls += f"{Path(f'./derge_base/{derge_vol}').read_text(encoding='utf-8')}\n"
     logging.info(f'Derge vol {" &".join(derge_vols)} merged to form pedurma {pedurma_vol_num}..')
     pedurma_hfml = Path(f'./google_pedurma_hfmls_with_tsek/{pedurma_vol_num}.txt').read_text(encoding='utf-8')
     derge_google_vol = transfer_pg_br(derge_hfmls, pedurma_hfml)
@@ -91,7 +94,7 @@ def build_derge_google_pedurma(pedurma_vol_mapping, derge_vol_mapping):
         if derge_google_vol_path.is_file():
             print(f'INFO: {pedurma_vol_num} completed..')
             continue
-        if int(vol_id) > 41 and int(vol_id) < 49:
+        if int(vol_id) > 99 and int(vol_id) < 101:
             continue
         derge_google_vol = get_derge_google_vol(pedurma_vol, derge_vol_mapping, pedurma_vol_num)
         derge_google_vol = rm_extra_tsek(derge_google_vol)
